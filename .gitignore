@@ -1,0 +1,18 @@
+# Environment variables
+.env
+
+# Docker volumes (if mounted locally)
+grafana_data/
+prometheus_data/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE settings
+.idea/
+.vscode/
+*.swp

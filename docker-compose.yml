@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  # --- COLETOR DE DADOS ---
+  prometheus:
+    # Usa a versão do .env, se falhar usa v2.50.1 como padrão
+    image: prom/prometheus:${PROMETHEUS_VER:-v2.50.1}
+    container_name: awl_prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - awl_network
+
+  # --- VISUALIZADOR (DASHBOARD) ---
+  grafana:
+    # Usa a versão do .env, se falhar usa 10.3.3 como padrão
+    image: grafana/grafana:${GRAFANA_VER:-10.3.3}
+    container_name: awl_grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=${GF_SERVER_DOMAIN}
+      - GF_SERVER_ROOT_URL=https://${GF_SERVER_DOMAIN}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - awl_network
+    depends_on:
+      - prometheus
+
+networks:
+  awl_network:
+    external: true
+
+volumes:
+  prometheus_data:
+  grafana_data:
