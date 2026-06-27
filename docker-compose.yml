@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
   # --- COLETOR DE DADOS ---
-  monitoring_prometheus:
+  server_prometheus:
     # Usa a versão do .env, se falhar usa v2.50.1 como padrão
     image: prom/prometheus:${PROMETHEUS_VER:-v2.50.1}
-    container_name: monitoring_prometheus
+    container_name: server_prometheus
     restart: unless-stopped
     volumes:
     - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -18,11 +18,11 @@ services:
     networks:
       awl_network:
         aliases:
-        - awl_prometheus
-  monitoring_grafana:
+        - server_prometheus
+  server_grafana:
     # Usa a versão do .env, se falhar usa 10.3.3 como padrão
     image: grafana/grafana:${GRAFANA_VER:-10.3.3}
-    container_name: monitoring_grafana
+    container_name: server_grafana
     restart: unless-stopped
     environment:
     - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
@@ -35,9 +35,9 @@ services:
     networks:
       awl_network:
         aliases:
-        - awl_grafana
+        - server_grafana
     depends_on:
-    - monitoring_prometheus
+    - server_prometheus
 networks:
   awl_network:
     external: true
